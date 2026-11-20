@@ -55,14 +55,15 @@ footer{text-align:center;font-size:13px;opacity:.7;margin-top:18px}
 <canvas id="sn" aria-hidden="true"></canvas>
 <main>
 <header><h1>Divertiti a suonare</h1><div style="display:flex;gap:8px"><button id="bT" aria-expanded="false" aria-label="Temi e colori" title="Temi e colori" style="padding:4px 10px"><svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C6.5 2 2 6.2 2 11.5S6.3 21 11 21c1.3 0 2-.8 2-1.8 0-.5-.2-.9-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1 .8-1.8 1.8-1.8H16c3.3 0 6-2.6 6-5.8C22 5.6 17.5 2 12 2z" fill="#FAC775" stroke="#854F0B" stroke-width="1.3"/><circle cx="7" cy="11" r="1.6" fill="#D32F2F"/><circle cx="9.5" cy="6.8" r="1.6" fill="#378ADD"/><circle cx="14.5" cy="6.5" r="1.6" fill="#2E8B3A"/><circle cx="18" cy="10" r="1.6" fill="#D4537E"/></svg></button></div></header>
-<div class="row" style="justify-content:flex-end;margin:8px 0 0"><button id="bP" class="sel">Plettro</button><button id="bD">Dito</button></div>
+<div class="row" style="justify-content:flex-end;margin:8px 0 0"><button id="bL">Blocca note</button><button id="bP" class="sel">Plettro</button><button id="bD">Dito</button></div>
+<p style="margin:6px 0 0;font-size:14px;opacity:.8;text-align:right">Tieni premuti i tasti e scorri sulla buca per un accordo</p>
 <div id="set">
 <div class="row" id="tms"><b>Tema</b></div>
 <div class="row" id="cols"><b>Colore del plettro</b></div>
 <label class="ck"><input type="checkbox" id="lab" checked> Nome della nota sul tasto</label>
 </div>
-<div id="nota"><span id="big">Tocca!</span><svg id="stf" viewBox="0 20 130 152" width="128" height="150" aria-label="La nota sul pentagramma"></svg><span id="info">Tocca un tasto per suonare</span></div>
-<div id="box"><div id="wrap"><svg id="fb" width="1100" height="250" style="display:block"></svg></div><svg id="pn" width="90" height="250" style="display:block;flex:none"></svg></div>
+<div id="nota"><span id="big">Tocca!</span><svg id="stf" viewBox="0 20 130 152" width="128" height="150" aria-label="La nota sul pentagramma"></svg><span id="info">Tocca un tasto o scorri sulla buca</span></div>
+<div id="box"><div id="wrap"><svg id="fb" width="1100" height="250" style="display:block"></svg></div><svg id="pn" width="110" height="250" style="display:block;flex:none"></svg></div>
 <div class="hint"><span>← corde a vuoto</span><span>scorri per altri tasti →</span></div>
 <footer>Copyright © Ignazio Paolicelli</footer>
 </main>
@@ -71,7 +72,7 @@ footer{text-align:center;font-size:13px;opacity:.7;margin-top:18px}
 const N=['Do','Do#','Re','Re#','Mi','Fa','Fa#','Sol','Sol#','La','La#','Si'];
 const S=[{m:64,c:'#FFF8E7',o:'#888780',w:2.2,d:'#D85A30'},{m:59,c:'#FFF8E7',o:'#888780',w:2.8,d:'#D4537E'},{m:55,c:'#FFF8E7',o:'#888780',w:3.4,d:'#7F77DD'},{m:50,c:'#D3D1C7',o:'#5F5E5A',w:3,d:'#1D9E75'},{m:45,c:'#D3D1C7',o:'#5F5E5A',w:3.6,d:'#378ADD'},{m:40,c:'#D3D1C7',o:'#5F5E5A',w:4.2,d:'#639922'}];
 const COL=['#D4537E','#E24B4A','#EF9F27','#F2D34B','#639922','#1D9E75','#378ADD','#7F77DD','#8A4B1E','#2C2C2A','#FFFFFF'];
-const F=15,ns="http://www.w3.org/2000/svg",svg=document.getElementById('fb'),pn=document.getElementById('pn'),PW=90;
+const F=15,ns="http://www.w3.org/2000/svg",svg=document.getElementById('fb'),pn=document.getElementById('pn'),PW=110;
 const X=[0,70];let w=80;for(let i=1;i<=F;i++){X.push(X[X.length-1]+w);w*=0.965}
 const W=X[X.length-1]+20,T=22,G=38,H=T*2+G*5;
 svg.setAttribute('width',W);svg.setAttribute('height',H+20);svg.setAttribute('viewBox','0 0 '+W+' '+(H+20));
@@ -139,9 +140,37 @@ let ctx;
 function play(m){try{ctx=ctx||new (window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();const f=440*Math.pow(2,(m-69)/12),sr=ctx.sampleRate,len=Math.floor(sr*2.5),b=ctx.createBuffer(1,len,sr),d=b.getChannelData(0),p=Math.round(sr/f),r=new Float32Array(p);for(let i=0;i<p;i++)r[i]=Math.random()*2-1;for(let i=0;i<len;i++){const j=i%p,n=(j+1)%p;d[i]=r[j];r[j]=(r[j]+r[n])*0.497}const s=ctx.createBufferSource();s.buffer=b;s.connect(ctx.destination);s.start()}catch(e){}}
 const big=document.getElementById('big'),info=document.getElementById('info'),stf=document.getElementById('stf');
 const STP=[0,0,1,1,2,3,3,4,4,5,5,6],SH=[0,1,0,1,0,0,1,0,1,0,1,0];
-function staff(m,c){const B=120,K=5;let h='',y0=B-70,y1=B+28;for(let k=0;k<5;k++)h+='<line x1="6" x2="124" y1="'+(B-k*10)+'" y2="'+(B-k*10)+'" stroke="#2C2C2A" stroke-width="1.3"/>';h+='<text x="10" y="'+(B+9)+'" font-size="58" fill="#2C2C2A" font-family="Noto Music,Bravura,Segoe UI Symbol,serif">\u{1D11E}</text>';if(m!=null){const w=m+12,pc=w%12,pos=(Math.floor(w/12)-1)*7+STP[pc]-30,y=B-pos*K,x=80;for(let q=-2;q>=pos;q-=2)h+='<line x1="'+(x-13)+'" x2="'+(x+13)+'" y1="'+(B-q*K)+'" y2="'+(B-q*K)+'" stroke="#2C2C2A" stroke-width="1.3"/>';for(let q=10;q<=pos;q+=2)h+='<line x1="'+(x-13)+'" x2="'+(x+13)+'" y1="'+(B-q*K)+'" y2="'+(B-q*K)+'" stroke="#2C2C2A" stroke-width="1.3"/>';if(SH[pc])h+='<text x="'+(x-26)+'" y="'+(y+7)+'" font-size="20" font-weight="700" fill="'+c+'">#</text>';h+='<ellipse cx="'+x+'" cy="'+y+'" rx="7" ry="5" transform="rotate(-20 '+x+' '+y+')" fill="'+c+'"/>';const up=pos<4;y0=Math.min(y0,up?y-41:y-14);y1=Math.max(y1,up?y+12:y+41);h+='<line x1="'+(up?x+6.5:x-6.5)+'" x2="'+(up?x+6.5:x-6.5)+'" y1="'+y+'" y2="'+(up?y-35:y+35)+'" stroke="'+c+'" stroke-width="1.8"/>'}stf.innerHTML='<rect x="0" y="20" width="130" height="152" rx="12" fill="#FFFFFF"/>'+h}
-staff(null);
-S.forEach((s,i)=>{for(let f=0;f<=F;f++){const cx=(X[f]+X[f+1])/2,cy=T+G*i,g=el('g',{style:'cursor:pointer'});el('rect',{x:X[f],y:cy-G/2,width:X[f+1]-X[f],height:G,fill:'#ffffff','fill-opacity':0.001},g);const dot=el('ellipse',{cx:cx,cy:cy,rx:0,ry:0,fill:s.d},g);const tx=el('text',{x:cx,y:cy+5,'text-anchor':'middle','font-size':15,'font-weight':700,fill:'#ffffff','pointer-events':'none'},g);let tm;g.addEventListener('click',()=>{const m=s.m+f,nm=N[m%12],sy=st[i].y;pk.style.transition='none';mv(cfg.t==='d'?sy+18:sy-16);pk.getBoundingClientRect();pk.style.transition='';mv(sy);setTimeout(()=>{play(m);st[i].xs=X[f+1];st[i].t0=performance.now();if(!run){run=true;requestAnimationFrame(loop)}},90);clearTimeout(tm);if(cfg.l){dot.setAttribute('rx',nm.length>2?25:20);dot.setAttribute('ry',16);tx.textContent=nm}else{dot.setAttribute('rx',14);dot.setAttribute('ry',14);tx.textContent=''}tm=setTimeout(()=>{dot.setAttribute('rx',0);dot.setAttribute('ry',0);tx.textContent=''},550);big.textContent=nm;big.style.color=s.d;staff(m,s.d);big.classList.add('pop');setTimeout(()=>big.classList.remove('pop'),150);info.textContent='corda '+(i+1)+' · '+(f?'tasto '+f:'a vuoto')})}});
+function staff(list){const B=120,K=5,x0=82;let h='<rect x="0" y="20" width="130" height="152" rx="12" fill="#FFFFFF"/>';for(let k=0;k<5;k++)h+='<line x1="6" x2="124" y1="'+(B-k*10)+'" y2="'+(B-k*10)+'" stroke="#2C2C2A" stroke-width="1.3"/>';h+='<text x="10" y="'+(B+9)+'" font-size="58" fill="#2C2C2A" font-family="Noto Music,Bravura,Segoe UI Symbol,serif">\u{1D11E}</text>';
+const ns=list.map(n=>{const w=n.m+12,pc=w%12;return{pos:(Math.floor(w/12)-1)*7+STP[pc]-30,sh:SH[pc],c:n.c}}).sort((a,b)=>a.pos-b.pos);
+if(ns.length){const mn=ns[0].pos,mx=ns[ns.length-1].pos,L=(q)=>'<line x1="'+(x0-13)+'" x2="'+(x0+25)+'" y1="'+(B-q*K)+'" y2="'+(B-q*K)+'" stroke="#2C2C2A" stroke-width="1.3"/>';for(let q=-2;q>=mn;q-=2)h+=L(q);for(let q=10;q<=mx;q+=2)h+=L(q);
+let prev=-99,off=0,ks=0;ns.forEach(n=>{off=(n.pos-prev===1&&off===0)?13:0;prev=n.pos;const x=x0+off,y=B-n.pos*K;if(n.sh){h+='<text x="'+(x0-26-(ks%2)*11)+'" y="'+(y+7)+'" font-size="20" font-weight="700" fill="'+n.c+'">#</text>';ks++}h+='<ellipse cx="'+x+'" cy="'+y+'" rx="7" ry="5" transform="rotate(-20 '+x+' '+y+')" fill="'+n.c+'"/>'});
+if(ns.length===1){const n=ns[0],y=B-n.pos*K,up=n.pos<4;h+='<line x1="'+(up?x0+6.5:x0-6.5)+'" x2="'+(up?x0+6.5:x0-6.5)+'" y1="'+y+'" y2="'+(up?y-35:y+35)+'" stroke="'+n.c+'" stroke-width="1.8"/>'}}
+stf.innerHTML=h}
+staff([]);
+const D=S.map(()=>[]),lat=[-1,-1,-1,-1,-1,-1],press=new Map();let recent=[];
+function setDot(i,f,on){const d=D[i][f];if(!on){d.dot.setAttribute('rx',0);d.dot.setAttribute('ry',0);d.tx.textContent='';return}const nm=N[(S[i].m+f)%12];if(cfg.l){d.dot.setAttribute('rx',nm.length>2?25:20);d.dot.setAttribute('ry',16);d.tx.textContent=nm}else{d.dot.setAttribute('rx',14);d.dot.setAttribute('ry',14);d.tx.textContent=''}}
+function held(i,f){for(const p of press.values())if(p.i===i&&p.f===f)return true;return lat[i]===f}
+function cur(i){let f=-1;for(const p of press.values())if(p.i===i)f=Math.max(f,p.f);return f>=0?f:(lat[i]>=0?lat[i]:0)}
+function sound(i,f){const m=S[i].m+f,nm=N[m%12];play(m);st[i].xs=X[f+1];st[i].t0=performance.now();if(!run){run=true;requestAnimationFrame(loop)}
+const now=performance.now();recent=recent.filter(r=>now-r.t<700&&r.i!==i);recent.push({i:i,m:m,c:S[i].d,t:now});staff(recent);
+big.textContent=nm;big.style.color=S[i].d;big.classList.add('pop');setTimeout(()=>big.classList.remove('pop'),150);
+info.textContent=recent.length>1?'Insieme: '+recent.slice().sort((a,b)=>b.i-a.i).map(r=>N[r.m%12]).join(' · '):'corda '+(i+1)+' · '+(f?'tasto '+f:'a vuoto')}
+function anim(i){const sy=st[i].y;pk.style.transition='none';mv(cfg.t==='d'?sy+18:sy-16);pk.getBoundingClientRect();pk.style.transition='';mv(sy)}
+const tmr={};
+S.forEach((s,i)=>{for(let f=0;f<=F;f++){const cx=(X[f]+X[f+1])/2,cy=T+G*i,g=el('g',{style:'cursor:pointer'});el('rect',{x:X[f],y:cy-G/2,width:X[f+1]-X[f],height:G,fill:'#ffffff','fill-opacity':0.001},g);const dot=el('ellipse',{cx:cx,cy:cy,rx:0,ry:0,fill:s.d},g);const tx=el('text',{x:cx,y:cy+5,'text-anchor':'middle','font-size':15,'font-weight':700,fill:'#ffffff','pointer-events':'none'},g);D[i][f]={dot:dot,tx:tx};
+g.addEventListener('pointerdown',e=>{const k=i+'_'+f;clearTimeout(tmr[k]);if(cfg.b){if(lat[i]===f){lat[i]=-1;setDot(i,f,false);return}if(lat[i]>=0)setDot(i,lat[i],false);lat[i]=f}press.set(e.pointerId,{i:i,f:f});setDot(i,f,true);anim(i);sound(i,f)})}});
+function rel(e){const p=press.get(e.pointerId);if(!p)return;press.delete(e.pointerId);const k=p.i+'_'+p.f;tmr[k]=setTimeout(()=>{if(!held(p.i,p.f))setDot(p.i,p.f,false)},350)}
+addEventListener('pointerup',rel);addEventListener('pointercancel',rel);
+svg.style.touchAction='pan-x';pn.style.touchAction='none';
+const strum=new Map();
+function py(e){const r=pn.getBoundingClientRect();return (e.clientY-r.top)*(H+20)/r.height}
+pn.addEventListener('pointerdown',e=>{e.preventDefault();try{pn.setPointerCapture(e.pointerId)}catch(x){}const y=py(e);strum.set(e.pointerId,y);pk.style.transition='none';mv(y);st.forEach((s,i)=>{if(Math.abs(s.y-y)<7){mv(s.y);sound(i,cur(i))}})});
+pn.addEventListener('pointermove',e=>{if(!strum.has(e.pointerId))return;const a=strum.get(e.pointerId),y=py(e);if(a===y)return;const hit=[];st.forEach((s,i)=>{if((a-s.y)*(y-s.y)<0||(y===s.y&&a!==s.y))hit.push(i)});if(y<a)hit.reverse();hit.forEach(i=>sound(i,cur(i)));strum.set(e.pointerId,y);pk.style.transition='none';mv(y)});
+function srel(e){if(strum.delete(e.pointerId))pk.style.transition=''}
+pn.addEventListener('pointerup',srel);pn.addEventListener('pointercancel',srel);
+const bL=document.getElementById('bL');function lk(){bL.classList.toggle('sel',!!cfg.b)}lk();
+bL.onclick=()=>{cfg.b=!cfg.b;if(!cfg.b)lat.forEach((f,i)=>{if(f>=0){lat[i]=-1;if(!held(i,f))setDot(i,f,false)}});lk();save()};
+
 }
 </script>
 </body>
